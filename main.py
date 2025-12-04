@@ -1,7 +1,7 @@
 import os
 from telegram.ext import Updater, CommandHandler
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+BOT_TOKEN = os.getenv("7982718796:AAFQ7uUpG_b-apWRlmVt7YwDRfU7YQKHXxc")
 
 def start(update, context):
     update.message.reply_text("👁‍🔥 Evil Ban Checker Activated!\nSend a number to check WhatsApp status.")
