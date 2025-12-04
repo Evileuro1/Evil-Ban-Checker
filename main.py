@@ -1,29 +1,37 @@
+from flask import Flask, request
+import requests
 import os
-from telegram.ext import Updater, CommandHandler
 
-BOT_TOKEN = os.getenv("7982718796:AAFQ7uUpG_b-apWRlmVt7YwDRfU7YQKHXxc")
+TOKEN = os.getenv("BOT_TOKEN")
+URL = f"https://api.telegram.org/bot{TOKEN}/"
 
-def start(update, context):
-    update.message.reply_text("👁‍🔥 Evil Ban Checker Activated!\nSend a number to check WhatsApp status.")
+app = Flask(__name__)
 
-def check(update, context):
-    number = update.message.text.strip()
+def send_message(chat_id, text):
+    url = URL + "sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": text
+    }
+    requests.post(url, json=payload)
 
-    # Fake checker logic — replace later with real API
-    if number.startswith("+"):
-        update.message.reply_text(f"🔍 Checking {number}...\n\n⚠️ Result: Looks Safe (Not Banned)")
-    else:
-        update.message.reply_text("❌ Invalid number format! Use +234...")
+@app.route("/", methods=["POST", "GET"])
+def webhook():
+    if request.method == "POST":
+        data = request.get_json()
+        if "message" in data:
+            chat_id = data["message"]["chat"]["id"]
+            text = data["message"].get("text", "")
 
-def main():
-    updater = Updater(BOT_TOKEN, use_context=True)
-    dp = updater.dispatcher
+            if text == "/start":
+                send_message(chat_id, "🔥 Evil Ban Checker Online!")
+            else:
+                send_message(chat_id, "❗ Send /start to test.")
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("check", check))
+        return "OK", 200
 
-    updater.start_polling()
-    updater.idle()
+    return "Hello from Evil Ban Checker!", 200
+
 
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
